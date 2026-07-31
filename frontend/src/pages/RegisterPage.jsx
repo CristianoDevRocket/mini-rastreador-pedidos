@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import * as authService from '../services/authService'
+import Logo from '../components/Logo'
+import PasswordInput from '../components/PasswordInput'
 
 export default function RegisterPage() {
   const [nome, setNome] = useState('')
@@ -28,6 +30,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col gap-3">
+        <Logo className="mb-2" />
         <h1 className="text-xl font-semibold text-gray-900">Criar conta</h1>
 
         <input
@@ -46,14 +49,12 @@ export default function RegisterPage() {
           required
           className="border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Senha (mínimo 6 caracteres)"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
           minLength={6}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
 
         {erro && <p className="text-sm text-red-600">{erro}</p>}

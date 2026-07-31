@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import Logo from '../components/Logo'
+import PasswordInput from '../components/PasswordInput'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -28,6 +30,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col gap-3">
+        <Logo className="mb-2" />
         <h1 className="text-xl font-semibold text-gray-900">Entrar</h1>
 
         <input
@@ -38,13 +41,11 @@ export default function LoginPage() {
           required
           className="border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
 
         {erro && <p className="text-sm text-red-600">{erro}</p>}
