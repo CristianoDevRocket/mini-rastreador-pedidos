@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:test-pedidos.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+jwt:
+  secret: dGVzdC1zZWNyZXQta2V5LXBhcmEtdGVzdGVzLWF1dG9tYXRpemFkb3M=
+  expiration-ms: 7200000
