@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: pedidos
+  datasource:
+    url: jdbc:sqlite:pedidos.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:bWluaS1yYXN0cmVhZG9yLXBlZGlkb3Mtc2VjcmV0LWtleS0yMDI2LWRlc2FmaW8tdGVjbmljbw==}
+  expiration-ms: 7200000
