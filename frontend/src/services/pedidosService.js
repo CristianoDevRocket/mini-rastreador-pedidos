@@ -1,7 +1,7 @@
 import api from './api'
 
-export function listarPedidos() {
-  return api.get('/pedidos').then((res) => res.data)
+export function listarPedidos(page = 0, size = 10) {
+  return api.get('/pedidos', { params: { page, size } }).then((res) => res.data)
 }
 
 export function buscarPedido(id) {

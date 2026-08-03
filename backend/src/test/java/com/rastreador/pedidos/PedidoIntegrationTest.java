@@ -6,12 +6,14 @@ import com.rastreador.pedidos.dto.request.PedidoRequest;
 import com.rastreador.pedidos.dto.request.RegisterRequest;
 import com.rastreador.pedidos.dto.request.StatusUpdateRequest;
 import com.rastreador.pedidos.dto.response.LoginResponse;
+import com.rastreador.pedidos.dto.response.PagedResponse;
 import com.rastreador.pedidos.dto.response.PedidoResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -69,9 +71,10 @@ class PedidoIntegrationTest {
         assertThat(criarResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Long pedidoId = criarResponse.getBody().id();
 
-        ResponseEntity<PedidoResponse[]> listaResponse = restTemplate.exchange(
-                baseUrl() + "/pedidos", HttpMethod.GET, new HttpEntity<>(headersComToken(token)), PedidoResponse[].class);
-        assertThat(listaResponse.getBody()).isNotEmpty();
+        ResponseEntity<PagedResponse<PedidoResponse>> listaResponse = restTemplate.exchange(
+                baseUrl() + "/pedidos", HttpMethod.GET, new HttpEntity<>(headersComToken(token)),
+                new ParameterizedTypeReference<>() {});
+        assertThat(listaResponse.getBody().content()).isNotEmpty();
 
         HttpEntity<StatusUpdateRequest> statusRequest = new HttpEntity<>(
                 new StatusUpdateRequest(com.rastreador.pedidos.enums.StatusPedido.EM_PREPARO),

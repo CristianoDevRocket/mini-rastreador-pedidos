@@ -2,10 +2,14 @@ package com.rastreador.pedidos.controller;
 
 import com.rastreador.pedidos.dto.request.PedidoRequest;
 import com.rastreador.pedidos.dto.request.StatusUpdateRequest;
+import com.rastreador.pedidos.dto.response.PagedResponse;
 import com.rastreador.pedidos.dto.response.PedidoResponse;
 import com.rastreador.pedidos.service.PedidoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -37,8 +39,9 @@ public class PedidoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PedidoResponse>> listarTodos() {
-        return ResponseEntity.ok(pedidoService.listarTodos());
+    public ResponseEntity<PagedResponse<PedidoResponse>> listarTodos(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(pedidoService.listarTodos(pageable));
     }
 
     @GetMapping("/{id}")

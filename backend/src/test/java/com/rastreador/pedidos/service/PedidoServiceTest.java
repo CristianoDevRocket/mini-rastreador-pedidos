@@ -3,6 +3,7 @@ package com.rastreador.pedidos.service;
 import com.rastreador.pedidos.dto.request.ItemRequest;
 import com.rastreador.pedidos.dto.request.PedidoRequest;
 import com.rastreador.pedidos.dto.request.StatusUpdateRequest;
+import com.rastreador.pedidos.dto.response.PagedResponse;
 import com.rastreador.pedidos.dto.response.PedidoResponse;
 import com.rastreador.pedidos.entity.Pedido;
 import com.rastreador.pedidos.enums.StatusPedido;
@@ -16,6 +17,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -121,13 +125,17 @@ class PedidoServiceTest {
     }
 
     @Test
-    void listarTodos_deveRetornarTodosPedidosMapeados() {
-        when(pedidoRepository.findAll()).thenReturn(List.of(
+    void listarTodos_deveRetornarPaginaDePedidosMapeados() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Pedido> pedidos = List.of(
                 criarPedidoComStatus(StatusPedido.RECEBIDO),
-                criarPedidoComStatus(StatusPedido.ENTREGUE)));
+                criarPedidoComStatus(StatusPedido.ENTREGUE));
+        when(pedidoRepository.findAll(pageable)).thenReturn(new PageImpl<>(pedidos, pageable, pedidos.size()));
 
-        List<PedidoResponse> resultado = pedidoService.listarTodos();
+        PagedResponse<PedidoResponse> resultado = pedidoService.listarTodos(pageable);
 
-        assertThat(resultado).hasSize(2);
+        assertThat(resultado.content()).hasSize(2);
+        assertThat(resultado.totalElements()).isEqualTo(2);
+        assertThat(resultado.totalPages()).isEqualTo(1);
     }
 }

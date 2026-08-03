@@ -6,34 +6,77 @@ import PedidoForm from '../components/PedidoForm'
 import Logo from '../components/Logo'
 import { IconLogout, IconSearch } from '../components/icons'
 
+const TAMANHO_PAGINA = 10
+
 export default function PedidosPage() {
   const [pedidos, setPedidos] = useState([])
+  const [pagina, setPagina] = useState(0)
+  const [totalPaginas, setTotalPaginas] = useState(0)
   const [carregando, setCarregando] = useState(true)
+
   const [buscaId, setBuscaId] = useState('')
+  const [resultadoBusca, setResultadoBusca] = useState(null)
+  const [buscando, setBuscando] = useState(false)
+  const [erroBusca, setErroBusca] = useState('')
+
   const { logout } = useAuth()
 
-  const pedidosFiltrados = buscaId.trim() === ''
-    ? pedidos
-    : pedidos.filter((pedido) => String(pedido.id).includes(buscaId.trim()))
-
-  const carregarPedidos = useCallback(async () => {
-    const dados = await pedidosService.listarPedidos()
-    setPedidos(dados)
+  const carregarPagina = useCallback(async (numeroPagina) => {
+    setCarregando(true)
+    try {
+      const resposta = await pedidosService.listarPedidos(numeroPagina, TAMANHO_PAGINA)
+      setPedidos(resposta.content)
+      setPagina(resposta.page)
+      setTotalPaginas(resposta.totalPages)
+    } finally {
+      setCarregando(false)
+    }
   }, [])
 
   useEffect(() => {
-    carregarPedidos().finally(() => setCarregando(false))
-  }, [carregarPedidos])
+    carregarPagina(0)
+  }, [carregarPagina])
+
+  useEffect(() => {
+    if (buscaId.trim() === '') {
+      setResultadoBusca(null)
+      setErroBusca('')
+      return
+    }
+
+    const timeout = setTimeout(async () => {
+      setBuscando(true)
+      setErroBusca('')
+      try {
+        const pedido = await pedidosService.buscarPedido(buscaId.trim())
+        setResultadoBusca(pedido)
+      } catch {
+        setResultadoBusca(null)
+        setErroBusca('Nenhum pedido encontrado com esse ID.')
+      } finally {
+        setBuscando(false)
+      }
+    }, 400)
+
+    return () => clearTimeout(timeout)
+  }, [buscaId])
 
   async function handleCriar(pedido) {
     await pedidosService.criarPedido(pedido)
-    await carregarPedidos()
+    setBuscaId('')
+    await carregarPagina(0)
   }
 
   async function handleAtualizarStatus(id, status) {
     await pedidosService.atualizarStatus(id, status)
-    await carregarPedidos()
+    if (buscaId.trim() !== '') {
+      setResultadoBusca(await pedidosService.buscarPedido(id))
+    } else {
+      await carregarPagina(pagina)
+    }
   }
+
+  const emModoBusca = buscaId.trim() !== ''
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,16 +106,47 @@ export default function PedidosPage() {
             </div>
           </div>
 
-          {carregando && <p className="text-sm text-gray-500">Carregando...</p>}
-          {!carregando && pedidos.length === 0 && (
-            <p className="text-sm text-gray-500">Nenhum pedido cadastrado ainda.</p>
+          {emModoBusca ? (
+            <>
+              {buscando && <p className="text-sm text-gray-500">Buscando...</p>}
+              {erroBusca && <p className="text-sm text-gray-500">{erroBusca}</p>}
+              {resultadoBusca && (
+                <PedidoCard pedido={resultadoBusca} onAtualizarStatus={handleAtualizarStatus} />
+              )}
+            </>
+          ) : (
+            <>
+              {carregando && <p className="text-sm text-gray-500">Carregando...</p>}
+              {!carregando && pedidos.length === 0 && (
+                <p className="text-sm text-gray-500">Nenhum pedido cadastrado ainda.</p>
+              )}
+              {pedidos.map((pedido) => (
+                <PedidoCard key={pedido.id} pedido={pedido} onAtualizarStatus={handleAtualizarStatus} />
+              ))}
+
+              {totalPaginas > 1 && (
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    onClick={() => carregarPagina(pagina - 1)}
+                    disabled={pagina === 0 || carregando}
+                    className="text-sm text-blue-600 disabled:text-gray-300"
+                  >
+                    Anterior
+                  </button>
+                  <span className="text-sm text-gray-500">
+                    Página {pagina + 1} de {totalPaginas}
+                  </span>
+                  <button
+                    onClick={() => carregarPagina(pagina + 1)}
+                    disabled={pagina + 1 >= totalPaginas || carregando}
+                    className="text-sm text-blue-600 disabled:text-gray-300"
+                  >
+                    Próxima
+                  </button>
+                </div>
+              )}
+            </>
           )}
-          {!carregando && pedidos.length > 0 && pedidosFiltrados.length === 0 && (
-            <p className="text-sm text-gray-500">Nenhum pedido encontrado com esse ID.</p>
-          )}
-          {pedidosFiltrados.map((pedido) => (
-            <PedidoCard key={pedido.id} pedido={pedido} onAtualizarStatus={handleAtualizarStatus} />
-          ))}
         </section>
       </main>
     </div>

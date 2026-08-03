@@ -2,6 +2,7 @@ package com.rastreador.pedidos.service;
 
 import com.rastreador.pedidos.dto.request.PedidoRequest;
 import com.rastreador.pedidos.dto.request.StatusUpdateRequest;
+import com.rastreador.pedidos.dto.response.PagedResponse;
 import com.rastreador.pedidos.dto.response.PedidoResponse;
 import com.rastreador.pedidos.entity.Pedido;
 import com.rastreador.pedidos.enums.StatusPedido;
@@ -10,11 +11,12 @@ import com.rastreador.pedidos.exception.ResourceNotFoundException;
 import com.rastreador.pedidos.mapper.PedidoMapper;
 import com.rastreador.pedidos.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -54,10 +56,9 @@ public class PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public List<PedidoResponse> listarTodos() {
-        return pedidoRepository.findAll().stream()
-                .map(pedidoMapper::toResponse)
-                .toList();
+    public PagedResponse<PedidoResponse> listarTodos(Pageable pageable) {
+        Page<Pedido> pagina = pedidoRepository.findAll(pageable);
+        return PagedResponse.from(pagina, pedidoMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
