@@ -12,18 +12,28 @@ Sistema simplificado de rastreamento de pedidos de delivery: autenticação, cri
 - `backend/` — API REST (controller/service/repository/entity/dto/mapper/security/exception)
 - `frontend/` — aplicação React (pages/components/context/services)
 
+## Pré-requisitos
+
+- **JDK 21** instalado e no PATH (`java -version` deve mostrar 21.x). O projeto usa o Maven Wrapper, então **não precisa ter o Maven instalado** — mas o wrapper ainda precisa de um JDK para rodar.
+- **Node.js 20+** (recomendado 22 LTS) e npm.
+- Conexão com a internet na primeira execução: o `mvnw` baixa o Maven na primeira vez, o Maven baixa as dependências do backend, e o `npm install` baixa os pacotes do frontend. A funcionalidade de autocompletar endereço pelo CEP também depende de internet (consulta a API pública ViaCEP em tempo de uso).
+
 ## Como rodar
 
-### Backend (porta 8080)
+### 1. Backend (porta 8080)
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-Não requer Maven instalado (usa o Maven Wrapper). O banco SQLite (`pedidos.db`) é criado automaticamente na primeira execução.
+No Windows, se não estiver usando Git Bash/WSL, use `mvnw.cmd spring-boot:run` (ou `mvnw` direto no CMD/PowerShell).
 
-### Frontend (porta 5173)
+O banco SQLite (`pedidos.db`) é criado automaticamente na primeira execução, na própria pasta `backend/`. Aguarde a mensagem `Started RastreadorPedidosApplication` antes de abrir o frontend.
+
+### 2. Frontend (porta 5173)
+
+Em outro terminal:
 
 ```bash
 cd frontend
@@ -32,6 +42,8 @@ npm run dev
 ```
 
 Acesse `http://localhost:5173`. O backend precisa estar rodando em `http://localhost:8080` (CORS já liberado para essa origem).
+
+Não há usuário nem dados de exemplo pré-cadastrados — use a tela **Cadastre-se** para criar uma conta antes de logar.
 
 ### Testes do backend
 
@@ -51,9 +63,21 @@ Todas as rotas em `/pedidos/**` exigem header `Authorization: Bearer <token>`, o
 | POST | `/auth/register` | Cadastra usuário (nome, email, senha) |
 | POST | `/auth/login` | Autentica e retorna o JWT |
 | POST | `/pedidos` | Cria um pedido (cliente, endereço, itens) |
-| GET | `/pedidos` | Lista todos os pedidos |
+| GET | `/pedidos?page=0&size=10` | Lista pedidos paginados (ordenado por ID decrescente) |
 | GET | `/pedidos/{id}` | Busca um pedido por ID |
 | PATCH | `/pedidos/{id}/status` | Atualiza o status do pedido |
+
+`GET /pedidos` aceita `page` (padrão `0`) e `size` (padrão `10`) como query params e retorna:
+
+```json
+{
+  "content": [ /* pedidos da página atual */ ],
+  "page": 0,
+  "size": 10,
+  "totalElements": 23,
+  "totalPages": 3
+}
+```
 
 ### Status do pedido
 
