@@ -5,6 +5,9 @@ target/
 
 # SQLite
 *.db
+*.db-journal
+*.db-wal
+*.db-shm
 *.sqlite
 
 # Node / React
