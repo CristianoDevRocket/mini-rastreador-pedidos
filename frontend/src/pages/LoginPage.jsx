@@ -28,7 +28,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col gap-3">
         <Logo className="mb-2" />
         <h1 className="text-xl font-semibold text-gray-900">Entrar</h1>

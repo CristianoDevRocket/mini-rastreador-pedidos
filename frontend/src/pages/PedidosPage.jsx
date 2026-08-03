@@ -4,6 +4,7 @@ import * as pedidosService from '../services/pedidosService'
 import PedidoCard from '../components/PedidoCard'
 import PedidoForm from '../components/PedidoForm'
 import Logo from '../components/Logo'
+import { IconLogout } from '../components/icons'
 
 export default function PedidosPage() {
   const [pedidos, setPedidos] = useState([])
@@ -31,12 +32,15 @@ export default function PedidosPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between">
         <Logo />
-        <button onClick={logout} className="text-sm text-gray-500">Sair</button>
+        <button onClick={logout} className="text-sm text-gray-500 flex items-center gap-1.5">
+          <IconLogout className="w-4 h-4" />
+          Sair
+        </button>
       </header>
 
-      <main className="max-w-3xl mx-auto p-6 flex flex-col gap-6">
+      <main className="max-w-3xl mx-auto p-4 sm:p-6 flex flex-col gap-6">
         <PedidoForm onCriar={handleCriar} />
 
         <section className="flex flex-col gap-3">

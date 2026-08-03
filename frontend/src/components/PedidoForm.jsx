@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IconUser, IconMapPin, IconPackage, IconPlus } from './icons'
 
 const ITEM_VAZIO = { descricao: '', quantidade: 1 }
 
@@ -49,47 +50,56 @@ export default function PedidoForm({ onCriar }) {
     <form onSubmit={handleSubmit} className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm flex flex-col gap-3">
       <h2 className="font-semibold text-gray-900">Novo pedido</h2>
 
-      <input
-        type="text"
-        placeholder="Cliente"
-        value={cliente}
-        onChange={(e) => setCliente(e.target.value)}
-        required
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-      />
-      <input
-        type="text"
-        placeholder="Endereço de entrega"
-        value={enderecoEntrega}
-        onChange={(e) => setEnderecoEntrega(e.target.value)}
-        required
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-      />
+      <div className="relative">
+        <IconUser className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Cliente"
+          value={cliente}
+          onChange={(e) => setCliente(e.target.value)}
+          required
+          className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm"
+        />
+      </div>
+      <div className="relative">
+        <IconMapPin className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Endereço de entrega"
+          value={enderecoEntrega}
+          onChange={(e) => setEnderecoEntrega(e.target.value)}
+          required
+          className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm"
+        />
+      </div>
 
       <div className="flex flex-col gap-2">
         {itens.map((item, index) => (
-          <div key={index} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Item"
-              value={item.descricao}
-              onChange={(e) => atualizarItem(index, 'descricao', e.target.value)}
-              required
-              className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-            />
+          <div key={index} className="flex flex-wrap gap-2">
+            <div className="relative flex-1 min-w-[140px]">
+              <IconPackage className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Item"
+                value={item.descricao}
+                onChange={(e) => atualizarItem(index, 'descricao', e.target.value)}
+                required
+                className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm"
+              />
+            </div>
             <input
               type="number"
               min="1"
               value={item.quantidade}
               onChange={(e) => atualizarItem(index, 'quantidade', e.target.value)}
               required
-              className="w-20 border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className="w-20 shrink-0 border border-gray-300 rounded-md px-3 py-2 text-sm"
             />
             {itens.length > 1 && (
               <button
                 type="button"
                 onClick={() => removerItem(index)}
-                className="px-2 text-red-600 text-sm"
+                className="shrink-0 px-2 text-red-600 text-sm"
               >
                 Remover
               </button>
@@ -99,9 +109,10 @@ export default function PedidoForm({ onCriar }) {
         <button
           type="button"
           onClick={adicionarItem}
-          className="text-sm text-blue-600 self-start"
+          className="text-sm text-blue-600 self-start flex items-center gap-1"
         >
-          + Adicionar item
+          <IconPlus className="w-3.5 h-3.5" />
+          Adicionar item
         </button>
       </div>
 

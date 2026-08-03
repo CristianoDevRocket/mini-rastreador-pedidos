@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import StatusBadge from './StatusBadge'
+import StatusTrilha from './StatusTrilha'
 import { TRANSICOES_VALIDAS } from '../constants/statusTransitions'
+import { IconUser, IconMapPin, IconPackage } from './icons'
 
 export default function PedidoCard({ pedido, onAtualizarStatus }) {
   const [atualizando, setAtualizando] = useState(false)
@@ -20,19 +21,29 @@ export default function PedidoCard({ pedido, onAtualizarStatus }) {
 
   return (
     <div className="border border-gray-200 rounded-lg p-4 flex flex-col gap-3 bg-white shadow-sm">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="font-semibold text-gray-900">#{pedido.id} — {pedido.cliente}</p>
-          <p className="text-sm text-gray-500">{pedido.enderecoEntrega}</p>
-        </div>
-        <StatusBadge status={pedido.status} />
+      <div>
+        <p className="font-semibold text-gray-900 flex items-center gap-1.5">
+          <IconUser className="w-4 h-4 text-gray-400" />
+          #{pedido.id} — {pedido.cliente}
+        </p>
+        <p className="text-sm text-gray-500 flex items-center gap-1.5 mt-0.5">
+          <IconMapPin className="w-4 h-4 text-gray-400" />
+          {pedido.enderecoEntrega}
+        </p>
       </div>
 
-      <ul className="text-sm text-gray-700 list-disc list-inside">
+      <ul className="text-sm text-gray-700 flex flex-col gap-1">
         {pedido.itens.map((item, index) => (
-          <li key={index}>{item.quantidade}x {item.descricao}</li>
+          <li key={index} className="flex items-center gap-1.5">
+            <IconPackage className="w-4 h-4 text-gray-400" />
+            {item.quantidade}x {item.descricao}
+          </li>
         ))}
       </ul>
+
+      <div className="border-t border-gray-100 pt-3">
+        <StatusTrilha status={pedido.status} />
+      </div>
 
       {proximosStatus.length > 0 && (
         <select
