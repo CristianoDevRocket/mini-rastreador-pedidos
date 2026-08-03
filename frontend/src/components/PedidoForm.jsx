@@ -1,14 +1,44 @@
 import { useState } from 'react'
 import { IconUser, IconMapPin, IconPackage, IconPlus } from './icons'
+import { buscarEnderecoPorCep } from '../services/cepService'
 
 const ITEM_VAZIO = { descricao: '', quantidade: 1 }
 
+function formatarCep(valor) {
+  const digitos = valor.replace(/\D/g, '').slice(0, 8)
+  return digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos
+}
+
 export default function PedidoForm({ onCriar }) {
   const [cliente, setCliente] = useState('')
-  const [enderecoEntrega, setEnderecoEntrega] = useState('')
+  const [cep, setCep] = useState('')
+  const [numero, setNumero] = useState('')
+  const [endereco, setEndereco] = useState('')
+  const [buscandoCep, setBuscandoCep] = useState(false)
+  const [erroCep, setErroCep] = useState('')
   const [itens, setItens] = useState([{ ...ITEM_VAZIO }])
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
+
+  async function handleCepChange(event) {
+    const valorFormatado = formatarCep(event.target.value)
+    setCep(valorFormatado)
+    setErroCep('')
+
+    const digitos = valorFormatado.replace(/\D/g, '')
+    if (digitos.length !== 8) return
+
+    setBuscandoCep(true)
+    try {
+      const dados = await buscarEnderecoPorCep(digitos)
+      setEndereco(`${dados.logradouro}, ${dados.bairro} - ${dados.cidade}/${dados.uf}`)
+    } catch {
+      setErroCep('CEP não encontrado')
+      setEndereco('')
+    } finally {
+      setBuscandoCep(false)
+    }
+  }
 
   function atualizarItem(index, campo, valor) {
     setItens((atuais) =>
@@ -32,11 +62,13 @@ export default function PedidoForm({ onCriar }) {
     try {
       await onCriar({
         cliente,
-        enderecoEntrega,
+        enderecoEntrega: `${endereco}, nº ${numero} (CEP ${cep})`,
         itens: itens.map((item) => ({ ...item, quantidade: Number(item.quantidade) })),
       })
       setCliente('')
-      setEnderecoEntrega('')
+      setCep('')
+      setNumero('')
+      setEndereco('')
       setItens([{ ...ITEM_VAZIO }])
     } catch (error) {
       console.error('Falha ao criar pedido', error)
@@ -61,17 +93,42 @@ export default function PedidoForm({ onCriar }) {
           className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm"
         />
       </div>
-      <div className="relative">
-        <IconMapPin className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+
+      <div className="flex flex-wrap gap-2">
+        <div className="relative w-32 shrink-0">
+          <input
+            type="text"
+            placeholder="CEP"
+            value={cep}
+            onChange={handleCepChange}
+            required
+            className="w-full border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm"
+          />
+          {buscandoCep && (
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          )}
+        </div>
         <input
           type="text"
-          placeholder="Endereço de entrega"
-          value={enderecoEntrega}
-          onChange={(e) => setEnderecoEntrega(e.target.value)}
+          placeholder="Número"
+          value={numero}
+          onChange={(e) => setNumero(e.target.value)}
           required
-          className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm"
+          className="w-24 shrink-0 border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
+        <div className="relative flex-1 min-w-[180px]">
+          <IconMapPin className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Endereço (preenchido pelo CEP)"
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+            required
+            className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm"
+          />
+        </div>
       </div>
+      {erroCep && <p className="text-sm text-red-600">{erroCep}</p>}
 
       <div className="flex flex-col gap-2">
         {itens.map((item, index) => (
