@@ -3,3 +3,13 @@
 body {
   margin: 0;
 }
+
+button:not(:disabled),
+select,
+a {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
