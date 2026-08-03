@@ -4,12 +4,17 @@ import * as pedidosService from '../services/pedidosService'
 import PedidoCard from '../components/PedidoCard'
 import PedidoForm from '../components/PedidoForm'
 import Logo from '../components/Logo'
-import { IconLogout } from '../components/icons'
+import { IconLogout, IconSearch } from '../components/icons'
 
 export default function PedidosPage() {
   const [pedidos, setPedidos] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [buscaId, setBuscaId] = useState('')
   const { logout } = useAuth()
+
+  const pedidosFiltrados = buscaId.trim() === ''
+    ? pedidos
+    : pedidos.filter((pedido) => String(pedido.id).includes(buscaId.trim()))
 
   const carregarPedidos = useCallback(async () => {
     const dados = await pedidosService.listarPedidos()
@@ -44,12 +49,28 @@ export default function PedidosPage() {
         <PedidoForm onCriar={handleCriar} />
 
         <section className="flex flex-col gap-3">
-          <h2 className="font-semibold text-gray-900">Pedidos</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-semibold text-gray-900">Pedidos</h2>
+            <div className="relative w-48">
+              <IconSearch className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Buscar por ID"
+                value={buscaId}
+                onChange={(e) => setBuscaId(e.target.value)}
+                className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-1.5 text-sm"
+              />
+            </div>
+          </div>
+
           {carregando && <p className="text-sm text-gray-500">Carregando...</p>}
           {!carregando && pedidos.length === 0 && (
             <p className="text-sm text-gray-500">Nenhum pedido cadastrado ainda.</p>
           )}
-          {pedidos.map((pedido) => (
+          {!carregando && pedidos.length > 0 && pedidosFiltrados.length === 0 && (
+            <p className="text-sm text-gray-500">Nenhum pedido encontrado com esse ID.</p>
+          )}
+          {pedidosFiltrados.map((pedido) => (
             <PedidoCard key={pedido.id} pedido={pedido} onAtualizarStatus={handleAtualizarStatus} />
           ))}
         </section>
