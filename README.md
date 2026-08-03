@@ -15,7 +15,7 @@ Sistema simplificado de rastreamento de pedidos de delivery: autenticação, cri
 ## Pré-requisitos
 
 - **JDK 21** instalado e no PATH (`java -version` deve mostrar 21.x). O projeto usa o Maven Wrapper, então **não precisa ter o Maven instalado** — mas o wrapper ainda precisa de um JDK para rodar.
-- **Node.js 20+** (recomendado 22 LTS) e npm.
+- **Node.js 22 LTS** (versão mais recente) e npm. O `react-router` 8 declara exigir Node >= 22.22; versões um pouco mais antigas do Node 22 tendem a funcionar mesmo assim (é só um aviso do npm, não bloqueia o `install`/`build`), mas o recomendado é manter o Node atualizado.
 - Conexão com a internet na primeira execução: o `mvnw` baixa o Maven na primeira vez, o Maven baixa as dependências do backend, e o `npm install` baixa os pacotes do frontend. A funcionalidade de autocompletar endereço pelo CEP também depende de internet (consulta a API pública ViaCEP em tempo de uso).
 
 ## Como rodar
